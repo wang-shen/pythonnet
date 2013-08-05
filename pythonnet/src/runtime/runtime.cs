@@ -402,7 +402,9 @@ namespace Python.Runtime {
                 if ((void*) 0 == f) {
                     return;
                 }
-                NativeCall.Impl.Void_Call_1(new IntPtr(f), op);
+                Interop.DestructorFunc dealloc = Marshal.GetDelegateForFunctionPointer(new IntPtr(f), 
+                            typeof(Interop.DestructorFunc)) as Interop.DestructorFunc;
+                dealloc(op);
                 return;
             }
         }
