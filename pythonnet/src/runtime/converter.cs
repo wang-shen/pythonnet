@@ -12,7 +12,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Globalization;
 using System.Security;
-using System.Collections;
 
 namespace Python.Runtime {
 
@@ -92,14 +91,11 @@ namespace Python.Runtime {
                 return result;
             }
 
-            if (value is IEnumerable)
+            PyObject p = value as PyObject;
+            if (p != null)
             {
-                var resultlist = new PyList();
-                foreach (object o in (IEnumerable)value)
-                {
-                    resultlist.Append(new PyObject(ToPython(o, o.GetType())));
-                }
-                return resultlist.Handle;
+                Runtime.Incref(p.obj);
+                return p.obj;
             }
 
             // hmm - from Python, we almost never care what the declared
@@ -314,8 +310,10 @@ namespace Python.Runtime {
                                         "value cannot be converted to Object"
                                         );
                 }
-
-                return false;
+                // returns dynamic object
+                Runtime.Incref(value);
+                result = new PyObject(value);
+                return true;
             }
 
             return ToPrimitive(value, obType, out result, setError);
