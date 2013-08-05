@@ -219,7 +219,7 @@ namespace Python.Runtime {
                 }
             }
 
-            if (type.IsInterface) {
+            //if (type.IsInterface) {
                 // Interface inheritance seems to be a different animal: 
                 // more contractual, less structural.  Thus, a Type that
                 // represents an interface that inherits from another 
@@ -243,7 +243,7 @@ namespace Python.Runtime {
                         }
                     }
                 }
-            }
+            //}
 
             for (i = 0; i < items.Count; i++) {
 
