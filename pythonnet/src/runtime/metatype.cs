@@ -96,7 +96,9 @@ namespace Python.Runtime {
 
             IntPtr func = Marshal.ReadIntPtr(Runtime.PyTypeType,
                                              TypeOffset.tp_new);
-            IntPtr type = NativeCall.Call_3(func, tp, args, kw);
+            Interop.TernaryFunc class_new = Marshal.GetDelegateForFunctionPointer(func, 
+                        typeof(Interop.TernaryFunc)) as Interop.TernaryFunc;
+            IntPtr type = class_new(tp, args, kw);
             if (type == IntPtr.Zero) {
                 return IntPtr.Zero;
             }
@@ -153,7 +155,9 @@ namespace Python.Runtime {
                 return Exceptions.RaiseTypeError("invalid object");
             }
             
-            IntPtr obj = NativeCall.Call_3(func, tp, args, kw);
+            Interop.TernaryFunc class_new = Marshal.GetDelegateForFunctionPointer(func, 
+                        typeof(Interop.TernaryFunc)) as Interop.TernaryFunc;
+            IntPtr obj = class_new(tp, args, kw);
             if (obj == IntPtr.Zero) {
                 return IntPtr.Zero;
             }
@@ -201,7 +205,9 @@ namespace Python.Runtime {
                 IntPtr dt = Runtime.PyObject_TYPE(descr);
                 IntPtr fp = Marshal.ReadIntPtr(dt, TypeOffset.tp_descr_set);
                 if (fp != IntPtr.Zero) {
-                    return NativeCall.Impl.Int_Call_3(fp, descr, name, value);
+                    Interop.ObjObjArgFunc descr_set = Marshal.GetDelegateForFunctionPointer(fp, 
+                                typeof(Interop.ObjObjArgFunc)) as Interop.ObjObjArgFunc;
+                    return descr_set(descr, name, value);
                 }
                 Exceptions.SetError(Exceptions.AttributeError,
                                     "attribute is read-only");
@@ -251,7 +257,9 @@ namespace Python.Runtime {
             // case our CLR metatype. That is why we implement tp_free.
 
             op = Marshal.ReadIntPtr(Runtime.PyTypeType, TypeOffset.tp_dealloc);
-            NativeCall.Void_Call_1(op, tp);
+            Interop.DestructorFunc dealloc = Marshal.GetDelegateForFunctionPointer(op, 
+                        typeof(Interop.DestructorFunc)) as Interop.DestructorFunc;
+            dealloc(tp);
 
             return;
         }
